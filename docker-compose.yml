@@ -1,0 +1,47 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:8.0
+    #volumes:
+      #- mysql_data:/var/lib/mysql
+      #- ./sqls/init:/docker-entrypoint-initdb.d
+    container_name: mysql2
+    hostname: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root-pass
+      MYSQL_DATABASE: golang-test-database
+      MYSQL_USER: golang-test-user
+      MYSQL_PASSWORD: golang-test-pass
+  app:
+    links:
+      - mysql
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: go_container
+    image: go-test
+    tty: true
+    restart: always
+    ports:
+      - "8080:8080"
+    #volumes:
+      #- ./:/go/src
+    depends_on:
+      - mysql
+    command: "go run main.go"
+  web:
+    build: 
+      context: path/to/myapp
+    ports:
+      - "1234:8080"
+    volumes:
+      - .:/app
+    stdin_open: true
+    tty: true
+    restart: always
+    command: "npm run serve"
+      
+#volumes:
+  #mysql_data:      
